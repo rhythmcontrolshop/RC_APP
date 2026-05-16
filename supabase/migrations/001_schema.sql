@@ -25,20 +25,10 @@ BEGIN
 END;
 $$;
 
--- ─── FUNCIÓN: is_admin (security definer) ───────────────────────────────────
--- Consulta el role del usuario autenticado. Security definer para que RLS
--- pueda llamarla sin recursión ni privilege escalation.
-CREATE OR REPLACE FUNCTION is_admin()
-RETURNS boolean LANGUAGE sql SECURITY DEFINER STABLE AS $$
-  SELECT EXISTS (
-    SELECT 1 FROM profiles
-    WHERE id = auth.uid() AND role = 'admin'
-  );
-$$;
-
 -- ═══════════════════════════════════════════════════════════════════════════
 -- TABLA: profiles
 -- Extiende auth.users. Se crea automáticamente en el trigger de registro.
+-- is_admin() se define DESPUÉS de profiles para que pueda referenciarla.
 -- ═══════════════════════════════════════════════════════════════════════════
 CREATE TABLE profiles (
   id               uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -69,6 +59,16 @@ $$;
 CREATE TRIGGER trg_on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION handle_new_user();
+
+-- ─── FUNCIÓN: is_admin (security definer) ────────────────────────────────────
+-- Definida AQUÍ, después de profiles, para que la referencia sea válida.
+CREATE OR REPLACE FUNCTION is_admin()
+RETURNS boolean LANGUAGE sql SECURITY DEFINER STABLE AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM profiles
+    WHERE id = auth.uid() AND role = 'admin'
+  );
+$$;
 
 -- ═══════════════════════════════════════════════════════════════════════════
 -- TABLA: releases
@@ -123,8 +123,10 @@ CREATE INDEX idx_releases_is_featured ON releases (is_featured) WHERE is_feature
 CREATE INDEX idx_releases_web_price ON releases (web_price);
 CREATE INDEX idx_releases_synced_at ON releases (synced_at DESC);
 
--- Vista: stock disponible (para uso en queries de catálogo)
-CREATE OR REPLACE VIEW available_releases AS
+-- Vista: stock disponible. security_invoker=true para que respete RLS del caller.
+CREATE OR REPLACE VIEW available_releases
+  WITH (security_invoker = true)
+AS
 SELECT *,
   (CASE WHEN discogs_status = 'for_sale' THEN 1 ELSE 0 END + extra_stock) AS total_stock
 FROM releases
