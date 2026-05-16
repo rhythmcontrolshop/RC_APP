@@ -1,0 +1,165 @@
+@import "../styles/variables.css";
+@import "tailwindcss";
+
+/* ── Reset ───────────────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── Base ────────────────────────────────────────────────────────────────── */
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  line-height: 1.4;
+  min-height: 100dvh;
+  padding-bottom: var(--player-height); /* space for floating audio player */
+}
+
+/* ── Typography ──────────────────────────────────────────────────────────── */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-transform: var(--font-display-transform);
+  letter-spacing: var(--font-display-tracking);
+  color: var(--color-accent);
+}
+
+p,
+li,
+span,
+label {
+  font-family: var(--font-display);
+  letter-spacing: var(--font-display-tracking);
+}
+
+code,
+pre,
+kbd,
+samp {
+  font-family: var(--font-mono);
+  letter-spacing: var(--font-mono-tracking);
+}
+
+/* ── Links ───────────────────────────────────────────────────────────────── */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--color-accent);
+}
+
+/* ── Borders & Radius ────────────────────────────────────────────────────── */
+* {
+  border-radius: var(--radius-base);
+}
+
+/* ── Inputs & Buttons ────────────────────────────────────────────────────── */
+input,
+textarea,
+select,
+button {
+  font-family: var(--font-display);
+  font-size: inherit;
+  letter-spacing: var(--font-display-tracking);
+  text-transform: uppercase;
+  background: transparent;
+  border: var(--border-separator);
+  color: var(--color-text);
+  outline: none;
+  border-radius: 0;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--color-accent);
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── Scrollbar ────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-card);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text);
+}
+
+/* ── Marquee ─────────────────────────────────────────────────────────────── */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.marquee-track {
+  display: flex;
+  overflow: hidden;
+  width: 100%;
+}
+
+.marquee-content {
+  display: flex;
+  gap: var(--marquee-gap);
+  white-space: nowrap;
+  animation: marquee var(--marquee-speed) linear infinite;
+  will-change: transform;
+}
+
+.marquee-track:hover .marquee-content {
+  animation-play-state: paused;
+}
+
+/* ── Selection ───────────────────────────────────────────────────────────── */
+::selection {
+  background: var(--color-accent);
+  color: var(--color-bg);
+}
+
+/* ── Focus visible ───────────────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* ── Images ──────────────────────────────────────────────────────────────── */
+img {
+  max-width: 100%;
+  display: block;
+}
